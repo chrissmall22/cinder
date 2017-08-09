@@ -136,10 +136,11 @@ class PSSeriesISCSIDriver(san.SanISCSIDriver):
                 eqlx_chap_login, and eqlx_chap_password.
         1.4.1 - Rebranded driver to Dell EMC.
         1.4.2 - Enable report discard support.
+        1.4.3 - Collect stats for total_volumes and volumes_in_use
 
     """
 
-    VERSION = "1.4.2"
+    VERSION = "1.4.3"
 
     # ThirdPartySytems wiki page
     CI_WIKI_NAME = "Dell_Storage_CI"
@@ -316,7 +317,13 @@ class PSSeriesISCSIDriver(san.SanISCSIDriver):
             if line.startswith('VolumeReserve:'):
                 out_tup = line.rstrip().partition(' ')
                 provisioned_capacity = self._get_space_in_gb(out_tup[-1])
-
+            if line.startswith('TotalVolumes:'):
+                out_tup = line.rstrip().partition(' ')   
+                data['total_volumes'] = (out_tup[-1])
+            if line.startswith('VolumesInUse:'):
+                out_tup = line.rstrip().partition(' ')   
+                data['volumes_in_use'] = (out_tup[-1]) 
+                
         global_capacity = data['total_capacity_gb']
         global_free = data['free_capacity_gb']
 
